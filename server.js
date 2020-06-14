@@ -14,7 +14,7 @@ var cheerio = require("cheerio");
 var db = require("./models");
 
 var PORT = 3000;
-
+//var PORT = (process.env.PORT||3000);
 // Initialize Express
 var app = express();
 
@@ -35,10 +35,17 @@ app.use(express.json());
 // Make public a static folder
 app.use(express.static("public"));
 
-// Connect to the Mongo DB
-mongoose.connect("mongodb://localhost/hwwebscrape", {
-  useNewUrlParser: true
-});
+      // Connect to the Mongo DB
+      mongoose.connect(process.env.MONGODB_URI || "mongodb://user:password1@ds015889.mlab.com:15889/heroku_1gxjp3bc", {
+        useMongoClient: true
+      });
+      mongoose.Promise = Promise;
+      
+            // Start the server
+            app.listen(PORT, function () {
+              console.log("App running on port ", "http://localhost:" + PORT);
+            });
+      
 
 // Routes
 
@@ -283,11 +290,7 @@ app.delete("/deletecomment/:articleId/:id", function (req, res) {
 
       });
 
-      // Start the server
-      app.listen(PORT, function () {
-        console.log("App running on port ", "http://localhost:" + PORT);
-      });
-
+ 
 
       app.get("/notes/:id", function (req, res) {
 
