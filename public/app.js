@@ -25,6 +25,7 @@ $(document).on("click", ".comment-btn", function () {
       
       console.log(data);
         var ul=$("<ul>");
+        $(".modal-content").empty();
   for (var i=0; i<data.note.length;i++){
 
     var li=$("<li>")
