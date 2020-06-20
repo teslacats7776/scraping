@@ -13,7 +13,7 @@ var cheerio = require("cheerio");
 // Require all models
 var db = require("./models");
 
-var PORT = (process.env.PORT||3000);
+var PORT = (process.env.PORT || 3000);
 // Initialize Express
 var app = express();
 
@@ -34,10 +34,10 @@ app.use(express.json());
 // Make public a static folder
 app.use(express.static("public"));
 
-      // Connect to the Mongo DB
-      mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/hwwebscrape" );
-     
-      
+// Connect to the Mongo DB
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/hwwebscrape");
+
+
 // Routes
 
 // A GET route for scraping the echoJS website
@@ -175,130 +175,131 @@ app.delete("/delete/:id", function (req, res) {
 });
 
 app.delete("/deletecomment/:articleId/:id", function (req, res) {
-      var articleId = req.params.articleId
-      console.log(articleId, "articleid")
-      console.log(req.params.id, "noteid")
-      // db.Note.deleteOne({
-      //   _id: req.params.id
-      // })
-      // .then(function (dbArticles) {
-      //  res.json(dbArticles)
-      // })
-      // .catch(function (err) {
-      //   res.json(err);
-      // });
- 
-      db.Article.updateOne({
-        _id: articleId
-      }, {
-        $pullAll: {
-          note: [req.params.id]
-        }
-      })
-      .then(function (dbArticles) {
-                db.Note.deleteOne({
-        _id: req.params.id
-      })
-      .then(function (dbArticles) {
-       res.json(dbArticles)
-      })
-      .catch(function (err) {
-        res.json(err);
-      });
-            })
-            .catch(function (err) {
-                res.json(err);
-            });
-      });
-        
-       
+  var articleId = req.params.articleId
+  console.log(articleId, "articleid")
+  console.log(req.params.id, "noteid")
+  // db.Note.deleteOne({
+  //   _id: req.params.id
+  // })
+  // .then(function (dbArticles) {
+  //  res.json(dbArticles)
+  // })
+  // .catch(function (err) {
+  //   res.json(err);
+  // });
 
-      app.put("/saved/:id", function (req, res) {
-        db.Article.update({
+  db.Article.updateOne({
+      _id: articleId
+    }, {
+      $pullAll: {
+        note: [req.params.id]
+      }
+    })
+    .then(function (dbArticles) {
+      db.Note.deleteOne({
           _id: req.params.id
-        }, {
-          saved: true
-        }).then(
-          function (dbArticle) {
-            res.json(dbArticle);
-          }
-        );
-      });
-      // Route for grabbing a specific Article by id, populate it with it's note
-      app.get("/articles/:id", function (req, res) {
-        // TODO
-        // ====
-        // Finish the route so it finds one article using the req.params.id,
-        // and run the populate method with "note",
-        // then responds with the article with the note included
-        db.Article.findById(req.params.id)
-          // Specify that we want to populate the retrieved libraries with any associated books
-          .populate("note")
-          .then(function (dbUser) {
-            // If any Libraries are found, send them to the client with any associated Books
-            res.json(dbUser);
-          })
-          .catch(function (err) {
-            // If an error occurs, send it back to the client
-            res.json(err);
-          });
-      });
-
-      // Route for saving/updating an Article's associated Note
-      app.post("/articles/:id", function (req, res) {
-        // TODO
-        // ====
-        // save the new note that gets posted to the Notes collection
-        // then find an article from the req.params.id
-        // and update it's "note" property with the _id of the new note
-        db.Note.create(req.body)
-          .then(function (dbNote) {
-            const filter = {
-              _id: req.params.id
-            };
-            const update = {
-              $push: {
-                note: dbNote._id
-              }
-            };
-            // If a Note was created successfully, find one User (there's only one) and push the new Note's _id to the User's `notes` array
-            // { new: true } tells the query that we want it to return the updated User -- it returns the original by default
-            // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
-            return db.Article.findOneAndUpdate(filter, update, {
-              new: true
-            });
-          })
-          .then(function (dbUser) {
-            // If the User was updated successfully, send it back to the client
-            res.json(dbUser);
-          })
-          .catch(function (err) {
-            // If an error occurs, send it back to the client
-            res.json(err);
-          });
-
-
-
-      });
-
- 
-
-      app.get("/notes/:id", function (req, res) {
-
-        db.Note.findOne({ _id: req.params.id })
-    
-            .then(function (dbArticle) {
-    
-                res.json(dbArticle);
-            })
-            .catch(function (err) {
-    
-                res.json(err);
-            });
+        })
+        .then(function (dbArticles) {
+          res.json(dbArticles)
+        })
+        .catch(function (err) {
+          res.json(err);
+        });
+    })
+    .catch(function (err) {
+      res.json(err);
     });
-    
-            // Start the server
-            app.listen(PORT, function () {
-              console.log("App running on port ", "http://localhost:" + PORT);
-            });
-      
+});
+
+
+
+app.put("/saved/:id", function (req, res) {
+  db.Article.update({
+    _id: req.params.id
+  }, {
+    saved: true
+  }).then(
+    function (dbArticle) {
+      res.json(dbArticle);
+    }
+  );
+});
+// Route for grabbing a specific Article by id, populate it with it's note
+app.get("/articles/:id", function (req, res) {
+  // TODO
+  // ====
+  // Finish the route so it finds one article using the req.params.id,
+  // and run the populate method with "note",
+  // then responds with the article with the note included
+  db.Article.findById(req.params.id)
+    // Specify that we want to populate the retrieved libraries with any associated books
+    .populate("note")
+    .then(function (dbUser) {
+      // If any Libraries are found, send them to the client with any associated Books
+      res.json(dbUser);
+    })
+    .catch(function (err) {
+      // If an error occurs, send it back to the client
+      res.json(err);
+    });
+});
+
+// Route for saving/updating an Article's associated Note
+app.post("/articles/:id", function (req, res) {
+  // TODO
+  // ====
+  // save the new note that gets posted to the Notes collection
+  // then find an article from the req.params.id
+  // and update it's "note" property with the _id of the new note
+  db.Note.create(req.body)
+    .then(function (dbNote) {
+      const filter = {
+        _id: req.params.id
+      };
+      const update = {
+        $push: {
+          note: dbNote._id
+        }
+      };
+      // If a Note was created successfully, find one User (there's only one) and push the new Note's _id to the User's `notes` array
+      // { new: true } tells the query that we want it to return the updated User -- it returns the original by default
+      // Since our mongoose query returns a promise, we can chain another `.then` which receives the result of the query
+      return db.Article.findOneAndUpdate(filter, update, {
+        new: true
+      });
+    })
+    .then(function (dbUser) {
+      // If the User was updated successfully, send it back to the client
+      res.json(dbUser);
+    })
+    .catch(function (err) {
+      // If an error occurs, send it back to the client
+      res.json(err);
+    });
+
+
+
+});
+
+
+
+app.get("/notes/:id", function (req, res) {
+
+  db.Note.findOne({
+      _id: req.params.id
+    })
+
+    .then(function (dbArticle) {
+
+      res.json(dbArticle);
+    })
+    .catch(function (err) {
+
+      res.json(err);
+    });
+});
+
+// Start the server
+app.listen(PORT, function () {
+  console.log("App running on port ", "http://localhost:" + PORT);
+});
