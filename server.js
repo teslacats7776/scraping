@@ -35,17 +35,9 @@ app.use(express.json());
 app.use(express.static("public"));
 
       // Connect to the Mongo DB
-      mongoose.connect(process.env.MONGODB_URI || "mongodb://user:password1@ds015889.mlab.com:15889/heroku_1gxjp3bc", {
-        useMongoClient: true
-      });
-      mongoose.Promise = Promise;
+      mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/hwwebscrape" );
+     
       
-            // Start the server
-            app.listen(PORT, function () {
-              console.log("App running on port ", "http://localhost:" + PORT);
-            });
-      
-
 // Routes
 
 // A GET route for scraping the echoJS website
@@ -305,3 +297,8 @@ app.delete("/deletecomment/:articleId/:id", function (req, res) {
             });
     });
     
+            // Start the server
+            app.listen(PORT, function () {
+              console.log("App running on port ", "http://localhost:" + PORT);
+            });
+      
